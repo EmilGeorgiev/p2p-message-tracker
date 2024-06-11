@@ -1,0 +1,5 @@
+project:
+  name: p2p-message-tracker
+  tz: Europe/Sofia
+  adrFolder: ./docs/adr
+  packages: []
