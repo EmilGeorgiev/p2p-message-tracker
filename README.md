@@ -1,5 +1,3 @@
-# Go Interview - Gossamer
-
 ## Task Description
 
 Implement a peer-to-peer (p2p) message tracker. There is a `Message` type that is found in `network/message.go`.  
