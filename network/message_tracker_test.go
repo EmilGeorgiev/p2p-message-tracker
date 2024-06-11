@@ -223,7 +223,7 @@ func BenchmarkAdd(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		tracker.Add(messages[i])
+		_ = tracker.Add(messages[i])
 	}
 }
 
@@ -232,12 +232,12 @@ func BenchmarkDelete(b *testing.B) {
 	messages := createTestMessages(b.N)
 
 	for i := 0; i < b.N; i++ {
-		tracker.Add(messages[i])
+		_ = tracker.Add(messages[i])
 	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		tracker.Delete(messages[i].ID)
+		_ = tracker.Delete(messages[i].ID)
 	}
 }
 
@@ -246,12 +246,12 @@ func BenchmarkMessage(b *testing.B) {
 	messages := createTestMessages(b.N)
 
 	for i := 0; i < b.N; i++ {
-		tracker.Add(messages[i])
+		_ = tracker.Add(messages[i])
 	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		tracker.Message(messages[i].ID)
+		_, _ = tracker.Message(messages[i].ID)
 	}
 }
 
@@ -260,11 +260,11 @@ func BenchmarkMessages(b *testing.B) {
 	messages := createTestMessages(1000)
 
 	for i := 0; i < 1000; i++ {
-		tracker.Add(messages[i])
+		_ = tracker.Add(messages[i])
 	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		tracker.Messages()
+		_ = tracker.Messages()
 	}
 }
