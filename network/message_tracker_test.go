@@ -1,6 +1,7 @@
 package network_test
 
 import (
+	"container/list"
 	"fmt"
 	"testing"
 
@@ -184,4 +185,16 @@ func TestMessageTracker_Message(t *testing.T) {
 		assert.ErrorIs(t, err, network.ErrMessageNotFound)
 		assert.Nil(t, msg)
 	})
+}
+
+func TestLinkedList(t *testing.T) {
+	linkedList := list.New()
+	linkedList.PushFront(0)
+	linkedList.PushFront(1)
+	linkedList.PushFront(2)
+	linkedList.PushFront(3)
+
+	for e := linkedList.Back(); e != nil; e = e.Prev() {
+		fmt.Println("Value is: ", e.Value)
+	}
 }
