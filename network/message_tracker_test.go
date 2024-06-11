@@ -1,7 +1,6 @@
 package network_test
 
 import (
-	"container/list"
 	"fmt"
 	"testing"
 
@@ -166,6 +165,28 @@ func TestMessageTracker_Cleanup(t *testing.T) {
 			generateMessage(9),
 		}, msgs)
 	})
+
+	t.Run("duplicated messages are moved to the front", func(t *testing.T) {
+		length := 5
+		mt := network.NewMessageTracker(length)
+
+		assert.NoError(t, mt.Add(generateMessage(0)))
+		assert.NoError(t, mt.Add(generateMessage(1)))
+		assert.NoError(t, mt.Add(generateMessage(2)))
+		assert.NoError(t, mt.Add(generateMessage(3)))
+		assert.NoError(t, mt.Add(generateMessage(4)))
+		assert.NoError(t, mt.Add(generateMessage(0)))
+		assert.NoError(t, mt.Add(generateMessage(1)))
+
+		msgs := mt.Messages()
+		assert.Equal(t, []*network.Message{
+			generateMessage(2),
+			generateMessage(3),
+			generateMessage(4),
+			generateMessage(0),
+			generateMessage(1),
+		}, msgs)
+	})
 }
 
 func TestMessageTracker_Delete(t *testing.T) {
@@ -187,14 +208,63 @@ func TestMessageTracker_Message(t *testing.T) {
 	})
 }
 
-func TestLinkedList(t *testing.T) {
-	linkedList := list.New()
-	linkedList.PushFront(0)
-	linkedList.PushFront(1)
-	linkedList.PushFront(2)
-	linkedList.PushFront(3)
+// createTestMessages generates a list of test messages
+func createTestMessages(n int) []*network.Message {
+	messages := make([]*network.Message, n)
+	for i := 0; i < n; i++ {
+		messages[i] = generateMessage(i)
+	}
+	return messages
+}
 
-	for e := linkedList.Back(); e != nil; e = e.Prev() {
-		fmt.Println("Value is: ", e.Value)
+func BenchmarkAdd(b *testing.B) {
+	tracker := network.NewMessageTracker(1000)
+	messages := createTestMessages(b.N)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		tracker.Add(messages[i])
+	}
+}
+
+func BenchmarkDelete(b *testing.B) {
+	tracker := network.NewMessageTracker(1000)
+	messages := createTestMessages(b.N)
+
+	for i := 0; i < b.N; i++ {
+		tracker.Add(messages[i])
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		tracker.Delete(messages[i].ID)
+	}
+}
+
+func BenchmarkMessage(b *testing.B) {
+	tracker := network.NewMessageTracker(1000)
+	messages := createTestMessages(b.N)
+
+	for i := 0; i < b.N; i++ {
+		tracker.Add(messages[i])
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		tracker.Message(messages[i].ID)
+	}
+}
+
+func BenchmarkMessages(b *testing.B) {
+	tracker := network.NewMessageTracker(1000)
+	messages := createTestMessages(1000)
+
+	for i := 0; i < 1000; i++ {
+		tracker.Add(messages[i])
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		tracker.Messages()
 	}
 }
