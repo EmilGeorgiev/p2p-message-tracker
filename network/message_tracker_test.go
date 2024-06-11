@@ -2,6 +2,7 @@ package network_test
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/ChainSafe/gossamer-go-interview/network"
@@ -205,6 +206,56 @@ func TestMessageTracker_Message(t *testing.T) {
 		msg, err := mt.Message("bleh")
 		assert.ErrorIs(t, err, network.ErrMessageNotFound)
 		assert.Nil(t, msg)
+	})
+}
+
+func TestMessageTracker_Concurrent(t *testing.T) {
+	t.Run("concurrent add and get", func(t *testing.T) {
+		length := 100
+		mt := network.NewMessageTracker(length)
+		var wg sync.WaitGroup
+
+		// Concurrently add messages
+		for i := 0; i < length; i++ {
+			wg.Add(1)
+			go func(i int) {
+				defer wg.Done()
+				msg := generateMessage(i)
+				err := mt.Add(msg)
+				assert.NoError(t, err)
+
+				actual, err := mt.Message(msg.ID)
+				assert.NoError(t, err)
+				assert.Equal(t, msg, actual)
+			}(i)
+		}
+
+		wg.Wait()
+	})
+
+	t.Run("concurrent add and delete", func(t *testing.T) {
+		length := 100
+		mt := network.NewMessageTracker(length)
+		var wg sync.WaitGroup
+
+		// Add messages
+		for i := 0; i < length; i++ {
+			msg := generateMessage(i)
+			err := mt.Add(msg)
+			assert.NoError(t, err)
+
+			err = mt.Delete(generateMessage(i).ID)
+			assert.NoError(t, err)
+		}
+
+		wg.Wait()
+
+		// Ensure all messages are deleted
+		for i := 0; i < length; i++ {
+			msg, err := mt.Message(generateMessage(i).ID)
+			assert.Error(t, err)
+			assert.Nil(t, msg)
+		}
 	})
 }
 
