@@ -50,3 +50,8 @@ gosec:
 # Run all checks
 all-checks: fmt lint vet staticcheck golangci-lint errcheck gosec
 	@echo "All checks passed!"
+
+# Run tests
+test:
+	@echo "Running tests...."
+	go test ./...
