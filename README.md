@@ -1,6 +1,6 @@
-## Task Description
+## Description
 
-Implement a peer-to-peer (p2p) message tracker. There is a `Message` type that is found in `network/message.go`.  
+This is a peer-to-peer (p2p) message tracker. There is a `Message` type that is found in `network/message.go`.  
 ```go 
 // Message is received from peers in a p2p network.
 type Message struct {
@@ -27,27 +27,8 @@ type MessageTracker interface {
 }
 ```
 
-There is an exported constructor `network.NewMessageTracker(length int)` which accepts a length parameter.  This parameter should be used to constrain the number of messages in your implementation.
+There is an exported constructor `network.NewMessageTracker(length int)` which accepts a length parameter.  This parameter is used to constrain the number of messages the tracker can track.
 
-There are some tests within the `network_test` package found in `network/message_tracker_test.go` which call the `network.NewMessageTracker` and test the functionality from outside the `network` package.
-
-There are a few key points to take into account when implementing this tracker:
-
-- The tracker is meant to be a hot path in our program so performance is critical.
-- Duplicate messages based on `Message.ID` should only be returned by `MessageTracker.All()` once.
-- The tracker should only hold a configurable maximum amount of messages so it does not grow in size indefinitely.
-
-## Submission Criteria
-- Implement the `MessageTracker` interface, and ensure tests in `network/message_tracker_test.go` pass.
-- Write unit tests for your `MessageTracker` implementation and obtain 70%+ code coverage.
-- BONUS: Write benchmarks for your tracker implementation.
-- BONUS: Write a design document that describes your implementation and the technical choices that you made.
-
-## Submission
-
-You must use `git` to track your changes.
-
-You can either submit us:
-
-- a URL to your Git repository
-- a zip file containing your Git repository
+There are a few key points:
+- Duplicate messages based on `Message.ID` are returned by `MessageTracker.All()` once.
+- The tracker holds only a configurable maximum amount of messages so it does not grow in size indefinitely.
